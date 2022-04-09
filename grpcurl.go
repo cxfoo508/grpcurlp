@@ -51,7 +51,7 @@ type sourceWithFiles interface {
 	GetAllFiles() ([]*desc.FileDescriptor, error)
 }
 
-var _ sourceWithFiles = (*fileSource)(nil)
+var _ sourceWithFiles = (*FileSource)(nil)
 
 // GetAllFiles uses the given descriptor source to return a list of file descriptors.
 func GetAllFiles(source DescriptorSource) ([]*desc.FileDescriptor, error) {
