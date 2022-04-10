@@ -88,7 +88,7 @@ func DescriptorSourceFromFileDescriptorSet(files *descriptorpb.FileDescriptorSet
 			return nil, err
 		}
 	}
-	return &FileSource{files: resolved}, nil
+	return &fileSource{files: resolved}, nil
 }
 
 func resolveFileDescriptor(unresolved map[string]*descriptorpb.FileDescriptorProto, resolved map[string]*desc.FileDescriptor, filename string) (*desc.FileDescriptor, error) {
@@ -124,7 +124,7 @@ func DescriptorSourceFromFileDescriptors(files ...*desc.FileDescriptor) (Descrip
 			return nil, err
 		}
 	}
-	return &FileSource{files: fds}, nil
+	return &fileSource{files: fds}, nil
 }
 
 func addFile(fd *desc.FileDescriptor, fds map[string]*desc.FileDescriptor) error {
@@ -146,13 +146,13 @@ func addFile(fd *desc.FileDescriptor, fds map[string]*desc.FileDescriptor) error
 	return nil
 }
 
-type FileSource struct {
+type fileSource struct {
 	files  map[string]*desc.FileDescriptor
 	er     *dynamic.ExtensionRegistry
 	erInit sync.Once
 }
 
-func (fs *FileSource) ListServices() ([]string, error) {
+func (fs *fileSource) ListServices() ([]string, error) {
 	set := map[string]bool{}
 	for _, fd := range fs.files {
 		for _, svc := range fd.GetServices() {
@@ -170,7 +170,7 @@ func (fs *FileSource) ListServices() ([]string, error) {
 // more thorough and more efficient than the fallback strategy used by
 // the GetAllFiles package method, for enumerating all files from a
 // descriptor source.
-func (fs *FileSource) GetAllFiles() ([]*desc.FileDescriptor, error) {
+func (fs *fileSource) GetAllFiles() ([]*desc.FileDescriptor, error) {
 	files := make([]*desc.FileDescriptor, len(fs.files))
 	i := 0
 	for _, fd := range fs.files {
@@ -180,7 +180,7 @@ func (fs *FileSource) GetAllFiles() ([]*desc.FileDescriptor, error) {
 	return files, nil
 }
 
-func (fs *FileSource) FindSymbol(fullyQualifiedName string) (desc.Descriptor, error) {
+func (fs *fileSource) FindSymbol(fullyQualifiedName string) (desc.Descriptor, error) {
 	for _, fd := range fs.files {
 		if dsc := fd.FindSymbol(fullyQualifiedName); dsc != nil {
 			return dsc, nil
@@ -189,7 +189,7 @@ func (fs *FileSource) FindSymbol(fullyQualifiedName string) (desc.Descriptor, er
 	return nil, notFound("Symbol", fullyQualifiedName)
 }
 
-func (fs *FileSource) AllExtensionsForType(typeName string) ([]*desc.FieldDescriptor, error) {
+func (fs *fileSource) AllExtensionsForType(typeName string) ([]*desc.FieldDescriptor, error) {
 	fs.erInit.Do(func() {
 		fs.er = &dynamic.ExtensionRegistry{}
 		for _, fd := range fs.files {

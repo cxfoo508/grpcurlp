@@ -4,10 +4,12 @@ go 1.17
 
 require (
 	github.com/golang/protobuf v1.5.2
-	github.com/jhump/protoreflect v1.10.3
+	github.com/jhump/protoreflect v1.11.0
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.26.0
 )
+
+replace github.com/jhump/protoreflect v1.11.0 => github.com/cxfoo508/protoreflectC v0.0.2
 
 require (
 	cloud.google.com/go v0.56.0 // indirect
